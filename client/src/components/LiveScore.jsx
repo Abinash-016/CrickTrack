@@ -15,9 +15,17 @@ export default function LiveScore({ match, currentInnings }) {
     requiredRR = ballsRemaining === 0 ? 0 : (runsNeeded / (ballsRemaining / 6)).toFixed(2);
   }
 
-  // Get last 12 balls
+  // Get last 18 balls
   const allBalls = currentInnings.balls || [];
-  const recentBalls = allBalls.slice(-12);
+  const recentBalls = allBalls.slice(-18);
+
+  const recentOvers = {};
+  recentBalls.forEach(ball => {
+    if (!recentOvers[ball.overNumber]) {
+      recentOvers[ball.overNumber] = [];
+    }
+    recentOvers[ball.overNumber].push(ball);
+  });
 
   const getBallBadgeColor = (ball) => {
     if (ball.wicket.isWicket) return 'bg-red-500 text-white';
@@ -98,19 +106,33 @@ export default function LiveScore({ match, currentInnings }) {
       {/* Recent Balls */}
       <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700">
         <h4 className="text-xs uppercase tracking-wider text-slate-400 mb-3 font-semibold">Recent Balls</h4>
-        <div className="flex flex-wrap gap-2">
-          {recentBalls.length === 0 ? (
+        <div className="space-y-4">
+          {Object.keys(recentOvers).length === 0 ? (
             <span className="text-slate-500 text-sm">No balls bowled yet.</span>
           ) : (
-            recentBalls.map((ball, idx) => (
-              <motion.div
-                key={ball._id || idx}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-lg ${getBallBadgeColor(ball)}`}
-              >
-                {formatBallLabel(ball)}
-              </motion.div>
+            Object.keys(recentOvers).sort((a,b) => a - b).map(overNum => (
+              <div key={overNum} className="flex items-center gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700/50">
+                <span className="text-xs text-slate-400 font-bold w-10 shrink-0 text-center">Ov {parseInt(overNum) + 1}</span>
+                <div className="flex flex-wrap gap-2 border-l border-slate-700 pl-3">
+                  {recentOvers[overNum].map((ball, idx) => (
+                    <motion.div
+                      key={ball._id || idx}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <span className="text-[10px] text-slate-400 font-medium leading-none">
+                        {ball.overNumber}.{ball.ballNumber}
+                      </span>
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-lg ${getBallBadgeColor(ball)}`}
+                      >
+                        {formatBallLabel(ball)}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             ))
           )}
         </div>

@@ -12,6 +12,23 @@ export default function MatchDashboard() {
   const navigate = useNavigate();
   const [match, setMatch] = useState(null);
   const [activeTab, setActiveTab] = useState('live'); // 'live' or 'scorecard'
+  const [showBottomNav, setShowBottomNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setShowBottomNav(false);
+      } else {
+        setShowBottomNav(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const fetchMatch = async () => {
     try {
@@ -93,7 +110,7 @@ export default function MatchDashboard() {
 
       {/* Fixed Bottom UI for Scoring Actions */}
       {activeTab === 'live' && !isMatchComplete && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div className={`fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] transition-transform duration-300 ${showBottomNav ? 'translate-y-0' : 'translate-y-full'}`}>
           <div className="container mx-auto max-w-lg md:max-w-3xl relative">
             <div className="flex justify-between items-center mb-3 px-2">
               <span className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Scoring Actions</span>
