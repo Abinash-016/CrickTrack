@@ -7,25 +7,37 @@ const matchRoutes = require('./routes/matchRoutes');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ Middleware
+app.use(cors({
+  origin: '*', // allow all for now (you can restrict later)
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
+// ✅ Routes
 app.use('/api/matches', matchRoutes);
 
+// ✅ Environment variables
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/crictrack';
+const MONGO_URI = process.env.MONGO_URI;
 
-// Connect to MongoDB
+// ❌ REMOVE local Mongo fallback in production
+// (Render will provide MONGO_URI via env)
+
+// ✅ Connect to MongoDB and start server
 mongoose.connect(MONGO_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB');
+
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error('❌ MongoDB connection error:', error.message);
   });
+
+// ✅ Health check route (VERY IMPORTANT for Render)
+app.get('/', (req, res) => {
+  res.send('CricTrack Backend Running ✅');
+});
