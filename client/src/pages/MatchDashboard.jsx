@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { ArrowLeft, RefreshCw, Undo2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Undo2, Camera, X } from 'lucide-react';
 import LiveScore from '../components/LiveScore';
 import Scorecard from '../components/Scorecard';
 import BallInputUI from '../components/BallInputUI';
@@ -14,6 +14,73 @@ export default function MatchDashboard() {
   const [activeTab, setActiveTab] = useState('live'); // 'live' or 'scorecard'
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const startCamera = async () => {
+    setShowCamera(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Could not access camera. Please check permissions.");
+      setShowCamera(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+    
+    setUploadingPhoto(true);
+    const canvas = document.createElement('canvas');
+    const video = videoRef.current;
+    
+    let width = video.videoWidth;
+    let height = video.videoHeight;
+    
+    if (width > 1280) {
+      height = Math.round(height * (1280 / width));
+      width = 1280;
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+    
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    
+    stopCamera();
+    
+    api.post(`/matches/${id}/photo`, { photo: dataUrl })
+      .then(() => fetchMatch())
+      .catch(err => {
+        console.error(err);
+        alert('Failed to upload photo');
+      })
+      .finally(() => setUploadingPhoto(false));
+  };
+
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,8 +156,49 @@ export default function MatchDashboard() {
       </div>
 
       {isMatchComplete && (
-        <div className="bg-emerald-900/40 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl text-center font-bold">
-          Match Completed! Winner: {match.winner}
+        <div className="bg-emerald-900/40 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl flex flex-col items-center text-center font-bold gap-4">
+          <span>Match Completed! Winner: {match.winner}</span>
+          
+          {match.winnersPhoto ? (
+            <div className="w-full max-w-sm rounded-lg overflow-hidden border-2 border-emerald-500/50 shadow-xl">
+              <img src={match.winnersPhoto} alt="Winners" className="w-full h-auto object-cover" />
+            </div>
+          ) : showCamera ? (
+            <div className="relative w-full max-w-sm rounded-lg overflow-hidden border-2 border-emerald-500/50 bg-black">
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                className="w-full h-64 object-cover"
+                onLoadedMetadata={() => videoRef.current?.play()}
+              />
+              <button 
+                onClick={stopCamera}
+                className="absolute top-2 right-2 bg-slate-900/80 p-2 rounded-full text-slate-300 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                <button 
+                  onClick={capturePhoto}
+                  className="bg-white text-emerald-600 px-8 py-2.5 rounded-full font-black uppercase tracking-wider shadow-[0_0_20px_rgba(255,255,255,0.6)] hover:scale-105 active:scale-95 transition-all"
+                >
+                  Snap!
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <button 
+                onClick={startCamera}
+                disabled={uploadingPhoto}
+                className={`flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl cursor-pointer transition-all shadow-lg ${uploadingPhoto ? 'opacity-50 pointer-events-none' : 'active:scale-95'}`}
+              >
+                <Camera size={20} />
+                {uploadingPhoto ? 'Processing Photo...' : 'Capture Winners Photo'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

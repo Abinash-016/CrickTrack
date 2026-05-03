@@ -42,7 +42,8 @@ const MatchSchema = new mongoose.Schema({
   currentInnings: { type: Number, default: 1 }, // 1 or 2
   status: { type: String, enum: ['not_started', 'in_progress', 'completed'], default: 'not_started' },
   innings: [InningsSchema], // Array to hold 1st and 2nd innings
-  winner: { type: String, default: null }
+  winner: { type: String, default: null },
+  winnersPhoto: { type: String, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Match', MatchSchema);

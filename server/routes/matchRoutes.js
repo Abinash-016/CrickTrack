@@ -216,5 +216,26 @@ router.post('/:id/undo', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Upload winners photo
+router.post('/:id/photo', async (req, res) => {
+  try {
+    const match = await Match.findById(req.params.id);
+    if (!match) return res.status(404).json({ message: 'Match not found' });
+    
+    if (match.status !== 'completed') {
+       return res.status(400).json({ message: 'Match is not completed yet' });
+    }
+
+    if (!req.body.photo) {
+       return res.status(400).json({ message: 'No photo provided' });
+    }
+
+    match.winnersPhoto = req.body.photo;
+    await match.save();
+    res.json(match);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

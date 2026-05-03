@@ -121,17 +121,17 @@ function CreateMatchModal({ onClose }) {
           <div className="flex gap-4">
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Total Overs</label>
-              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.overs} onChange={e => setFormData({...formData, overs: parseInt(e.target.value)})} />
+              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.overs} onChange={e => setFormData({...formData, overs: parseInt(e.target.value) || ''})} />
             </div>
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Balls per Over</label>
-              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.ballsPerOver} onChange={e => setFormData({...formData, ballsPerOver: parseInt(e.target.value)})} />
+              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.ballsPerOver} onChange={e => setFormData({...formData, ballsPerOver: parseInt(e.target.value) || ''})} />
             </div>
           </div>
           <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 mt-2">
             <label className="block text-sm font-semibold mb-3">Toss Details (Optional)</label>
             <div className="flex gap-2 mb-3">
-              {['', formData.teamA, formData.teamB].map(team => {
+              {[...new Set(['', formData.teamA, formData.teamB])].map(team => {
                 if(!team && (formData.teamA || formData.teamB)) return null;
                 const label = team || 'Not decided';
                 return (
