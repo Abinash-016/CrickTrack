@@ -2,18 +2,14 @@ import { useState } from 'react';
 import api from '../api';
 
 export default function BallInputUI({ matchId, onBallAdded }) {
-  const [loading, setLoading] = useState(false);
-
   const addBall = async (ballData) => {
-    setLoading(true);
+    // Optimistically fire and forget to prevent blocking the UI
     try {
       await api.post(`/matches/${matchId}/ball`, ballData);
       onBallAdded();
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || 'Error adding ball');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -42,7 +38,6 @@ export default function BallInputUI({ matchId, onBallAdded }) {
         {[0, 1, 2, 3, 4, 6].map(r => (
           <button 
             key={r} 
-            disabled={loading}
             onClick={() => quickAdd(r)}
             className={`h-10 rounded-xl font-black text-lg transition-all shadow-lg active:scale-95 flex items-center justify-center ${r === 4 ? 'bg-blue-600 text-white' : r === 6 ? 'bg-purple-600 text-white' : r === 0 ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-900'}`}
           >
@@ -52,35 +47,30 @@ export default function BallInputUI({ matchId, onBallAdded }) {
       </div>
       <div className="grid grid-cols-5 gap-2 mb-2">
         <button 
-          disabled={loading}
           onClick={() => quickExtra('wide')}
           className="h-10 rounded-xl font-bold bg-orange-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-500/30 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
           Wd
         </button>
         <button 
-          disabled={loading}
           onClick={() => quickExtra('noBall')}
           className="h-10 rounded-xl font-bold bg-orange-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-500/30 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
           Nb
         </button>
         <button 
-          disabled={loading}
           onClick={() => quickExtra('bye')}
           className="h-10 rounded-xl font-bold bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
           B
         </button>
         <button 
-          disabled={loading}
           onClick={() => quickExtra('legBye')}
           className="h-10 rounded-xl font-bold bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
           Lb
         </button>
         <button 
-          disabled={loading}
           onClick={quickWicket}
           className="h-10 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
