@@ -98,11 +98,22 @@ function CreateMatchModal({ onClose }) {
   const [formData, setFormData] = useState({
     matchName: '', teamA: '', teamB: '', overs: 10, ballsPerOver: 6, tossWinner: '', tossDecision: 'bat'
   });
-
+  const [players, setPlayers] = useState([]);
+  const [teamAPlayers, setTeamAPlayers] = useState([]);
+  const [teamBPlayers, setTeamBPlayers] = useState([]);
+  useEffect(() => {
+    api.get('/players')
+      .then(res => setPlayers(res.data))
+      .catch(console.error);
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/matches/create', formData);
+      const res = await api.post('/matches/create', {
+        ...formData,
+        teamAPlayers,
+        teamBPlayers
+      });
       navigate(`/match/${res.data._id}`);
     } catch (error) {
       console.error(error);
@@ -173,6 +184,60 @@ function CreateMatchModal({ onClose }) {
                 ))}
               </div>
             )}
+          </div>
+          {/* Player Selection */}
+          <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 mt-4">
+            <label className="block text-sm font-semibold mb-3">Select Players</label>
+
+            <div className="grid grid-cols-2 gap-4 max-h-40 overflow-y-auto">
+
+              {/* Team A */}
+              <div>
+                <h4 className="text-xs text-slate-400 mb-2">
+                  {formData.teamA || 'Team A'}
+                </h4>
+
+                {players.map(p => (
+                  <label key={p._id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setTeamAPlayers([...teamAPlayers, p._id]);
+                        } else {
+                          setTeamAPlayers(teamAPlayers.filter(id => id !== p._id));
+                        }
+                      }}
+                    />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+
+              {/* Team B */}
+              <div>
+                <h4 className="text-xs text-slate-400 mb-2">
+                  {formData.teamB || 'Team B'}
+                </h4>
+
+                {players.map(p => (
+                  <label key={p._id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setTeamBPlayers([...teamBPlayers, p._id]);
+                        } else {
+                          setTeamBPlayers(teamBPlayers.filter(id => id !== p._id));
+                        }
+                      }}
+                    />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+
+            </div>
           </div>
 
           <div className="flex gap-3 mt-6">

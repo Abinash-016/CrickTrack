@@ -6,7 +6,7 @@ const Match = require('../models/Match');
 router.post('/create', async (req, res) => {
   try {
     const { matchName, teamA, teamB, teamAPlayers, teamBPlayers, overs, ballsPerOver, tossWinner, tossDecision } = req.body;
-    
+
     // Determine batting/bowling team based on toss
     let battingTeam = teamA;
     let bowlingTeam = teamB;
@@ -62,7 +62,9 @@ router.get('/', async (req, res) => {
 // Get a match by ID
 router.get('/:id', async (req, res) => {
   try {
-    const match = await Match.findById(req.params.id);
+    const match = await Match.findById(req.params.id)
+      .populate('teams.teamAPlayers')
+      .populate('teams.teamBPlayers');
     if (!match) return res.status(404).json({ message: 'Match not found' });
     res.json(match);
   } catch (error) {
@@ -75,16 +77,16 @@ router.post('/:id/ball', async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) return res.status(404).json({ message: 'Match not found' });
-    
+
     if (match.status === 'completed') {
       return res.status(400).json({ message: 'Match is already completed' });
     }
 
     const { runs, extras, isLegalDelivery, wicket } = req.body;
-    
+
     const currentInningsIndex = match.currentInnings - 1;
     const innings = match.innings[currentInningsIndex];
-    
+
     // Determine over and ball number
     const overNumber = innings.completedOvers;
     const ballNumber = innings.ballsInCurrentOver + 1;
@@ -109,7 +111,7 @@ router.post('/:id/ball', async (req, res) => {
 
     if (newBall.isLegalDelivery) {
       innings.ballsInCurrentOver += 1;
-      
+
       // Check for over completion
       if (innings.ballsInCurrentOver >= match.ballsPerOver) {
         innings.completedOvers += 1;
@@ -130,7 +132,7 @@ router.post('/:id/ball', async (req, res) => {
         matchComplete = true;
       }
     }
-    
+
     // Team 2 chases down target
     if (match.currentInnings === 2) {
       const firstInningsRuns = match.innings[0].totalRuns;
@@ -148,11 +150,11 @@ router.post('/:id/ball', async (req, res) => {
       const score1 = match.innings[0].totalRuns;
       const score2 = match.innings[1].totalRuns;
       if (score1 > score2) {
-         match.winner = match.innings[0].battingTeam;
+        match.winner = match.innings[0].battingTeam;
       } else if (score2 > score1) {
-         match.winner = match.innings[1].battingTeam;
+        match.winner = match.innings[1].battingTeam;
       } else {
-         match.winner = 'Tie';
+        match.winner = 'Tie';
       }
     }
 
@@ -168,14 +170,14 @@ router.post('/:id/undo', async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) return res.status(404).json({ message: 'Match not found' });
-    
+
     if (match.status === 'not_started') {
-       return res.status(400).json({ message: 'No balls to undo' });
+      return res.status(400).json({ message: 'No balls to undo' });
     }
 
     let currentInningsIndex = match.currentInnings - 1;
     let innings = match.innings[currentInningsIndex];
-    
+
     if (innings.balls.length === 0 && match.currentInnings === 2) {
       match.currentInnings = 1;
       currentInningsIndex = 0;
@@ -221,13 +223,13 @@ router.post('/:id/photo', async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) return res.status(404).json({ message: 'Match not found' });
-    
+
     if (match.status !== 'completed') {
-       return res.status(400).json({ message: 'Match is not completed yet' });
+      return res.status(400).json({ message: 'Match is not completed yet' });
     }
 
     if (!req.body.photo) {
-       return res.status(400).json({ message: 'No photo provided' });
+      return res.status(400).json({ message: 'No photo provided' });
     }
 
     match.winnersPhoto = req.body.photo;
