@@ -12,10 +12,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create a new player (NO DUPLICATES)
+// Create a new player (NO DUPLICATES + AVATAR SUPPORT)
 router.post('/create', async (req, res) => {
   try {
-    let { name } = req.body;
+    let { name, avatar } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: 'Player name is required' });
@@ -24,7 +24,11 @@ router.post('/create', async (req, res) => {
     // normalize input
     name = name.trim().toLowerCase();
 
-    const newPlayer = new Player({ name });
+    const newPlayer = new Player({
+      name,
+      avatar: avatar || null
+    });
+
     await newPlayer.save();
 
     res.status(201).json(newPlayer);

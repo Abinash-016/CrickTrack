@@ -8,6 +8,10 @@ const PlayerSchema = new mongoose.Schema({
     lowercase: true,
     unique: true
   },
+  avatar: {
+    type: String, // base64 image
+    default: null
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Player', PlayerSchema);

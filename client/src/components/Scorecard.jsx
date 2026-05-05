@@ -123,7 +123,14 @@ export default function Scorecard({ match }) {
 
               {match.teams.teamAPlayers.map(p => (
                 <div key={p._id} className="bg-slate-800 px-3 py-1 rounded text-sm">
-                  {p.name}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={p.avatar || 'https://via.placeholder.com/30'}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span>{p.name}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -136,7 +143,14 @@ export default function Scorecard({ match }) {
 
               {match.teams.teamBPlayers.map(p => (
                 <div key={p._id} className="text-sm">
-                  {p.name}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={p.avatar || 'https://via.placeholder.com/30'}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span>{p.name}</span>
+                  </div>
                 </div>
               ))}
             </div>

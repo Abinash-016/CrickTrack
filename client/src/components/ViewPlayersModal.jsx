@@ -18,8 +18,16 @@ export default function ViewPlayersModal({ onClose }) {
 
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                     {players.map(p => (
-                        <div key={p._id} className="bg-slate-800 px-3 py-2 rounded">
-                            {p.name}
+                        <div
+                            key={p._id}
+                            className="flex items-center gap-3 bg-slate-800 px-3 py-2 rounded"
+                        >
+                            <img
+                                src={p.avatar || 'https://via.placeholder.com/40'}
+                                alt="avatar"
+                                className="w-8 h-8 rounded-full object-cover"
+                            />
+                            <span>{p.name}</span>
                         </div>
                     ))}
                 </div>
