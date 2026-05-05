@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export default function Scorecard({ match }) {
   const [activeInnings, setActiveInnings] = useState(match.currentInnings - 1);
+  const [showPlayers, setShowPlayers] = useState(false);
 
   const getBallLabel = (ball) => {
     if (ball.wicket.isWicket) return 'W';
@@ -48,7 +49,7 @@ export default function Scorecard({ match }) {
           </div>
           <div className="p-4 flex flex-wrap gap-2 items-center">
             {overData.balls.map((ball, idx) => (
-              <div 
+              <div
                 key={ball._id || idx}
                 className={`w-10 h-10 rounded-full flex flex-col items-center justify-center text-sm font-bold border ${getBallClass(ball)}`}
               >
@@ -91,6 +92,14 @@ export default function Scorecard({ match }) {
       </div>
 
       <h3 className="text-lg font-bold mb-4 ml-1">Over-by-Over Tracker</h3>
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowPlayers(true)}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg text-sm"
+        >
+          View Players
+        </button>
+      </div>
       <div className="space-y-4">
         {match.innings[activeInnings].balls.length === 0 ? (
           <div className="text-center py-8 text-slate-500 bg-slate-800/30 rounded-xl border border-slate-700/50">
@@ -100,6 +109,48 @@ export default function Scorecard({ match }) {
           formatOverTracker(match.innings[activeInnings].balls)
         )}
       </div>
+      {showPlayers && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-slate-900 p-6 rounded-xl w-full max-w-md">
+
+            <h3 className="text-lg font-bold mb-4">Players</h3>
+
+            {/* Team A */}
+            <div className="mb-4">
+              <h4 className="text-blue-400 font-semibold mb-2">
+                {match.teams.teamA}
+              </h4>
+
+              {match.teams.teamAPlayers.map(p => (
+                <div key={p._id} className="text-sm">
+                  {p.name}
+                </div>
+              ))}
+            </div>
+
+            {/* Team B */}
+            <div>
+              <h4 className="text-purple-400 font-semibold mb-2">
+                {match.teams.teamB}
+              </h4>
+
+              {match.teams.teamBPlayers.map(p => (
+                <div key={p._id} className="text-sm">
+                  {p.name}
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowPlayers(false)}
+              className="mt-4 w-full bg-slate-700 py-2 rounded"
+            >
+              Close
+            </button>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
