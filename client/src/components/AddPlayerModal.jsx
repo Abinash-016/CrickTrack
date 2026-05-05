@@ -11,7 +11,7 @@ export default function AddPlayerModal({ onClose }) {
             onClose();
         } catch (err) {
             console.error(err);
-            alert('Failed to add player');
+            alert(err.response?.data?.message || 'Failed to add player. May be player name Already exists😂');
         }
     };
 

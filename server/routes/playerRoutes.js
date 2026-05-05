@@ -12,17 +12,29 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create a new player
+// Create a new player (NO DUPLICATES)
 router.post('/create', async (req, res) => {
   try {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ message: 'Player name is required' });
-    
+    let { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: 'Player name is required' });
+    }
+
+    // normalize input
+    name = name.trim().toLowerCase();
+
     const newPlayer = new Player({ name });
     await newPlayer.save();
-    
+
     res.status(201).json(newPlayer);
+
   } catch (error) {
+    // duplicate key error (MongoDB)
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Player already exists' });
+    }
+
     res.status(500).json({ error: error.message });
   }
 });

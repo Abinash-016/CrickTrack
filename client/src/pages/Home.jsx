@@ -4,11 +4,13 @@ import api from '../api';
 import { PlusCircle, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AddPlayerModal from '../components/AddPlayerModal';
+import ViewPlayersModal from '../components/ViewPlayersModal';
 
 export default function Home() {
   const [matches, setMatches] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [showAllPlayers, setShowAllPlayers] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function Home() {
         <h2 className="text-xl font-semibold">Recent Matches</h2>
 
         <div className="flex gap-2">
+
           <button
             onClick={() => setShowPlayerModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-full"
@@ -29,11 +32,19 @@ export default function Home() {
           </button>
 
           <button
+            onClick={() => setShowAllPlayers(true)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-full"
+          >
+            View Players
+          </button>
+
+          <button
             onClick={() => setShowCreateModal(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-medium flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)]"
           >
             <PlusCircle size={20} /> New Match
           </button>
+
         </div>
       </div>
 
@@ -88,6 +99,9 @@ export default function Home() {
       )}
       {showPlayerModal && (
         <AddPlayerModal onClose={() => setShowPlayerModal(false)} />
+      )}
+      {showAllPlayers && (
+        <ViewPlayersModal onClose={() => setShowAllPlayers(false)} />
       )}
     </div>
   );
