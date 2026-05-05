@@ -122,7 +122,7 @@ export default function Scorecard({ match }) {
               </h4>
 
               {match.teams.teamAPlayers.map(p => (
-                <div key={p._id} className="text-sm">
+                <div key={p._id} className="bg-slate-800 px-3 py-1 rounded text-sm">
                   {p.name}
                 </div>
               ))}
