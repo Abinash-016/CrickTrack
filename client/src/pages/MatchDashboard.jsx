@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { ArrowLeft, RefreshCw, Undo2, Camera } from 'lucide-react';
+import { ArrowLeft, Undo2, Camera } from 'lucide-react';
 import LiveScore from '../components/LiveScore';
 import Scorecard from '../components/Scorecard';
 import BallInputUI from '../components/BallInputUI';
@@ -122,9 +122,6 @@ export default function MatchDashboard() {
             Scorecard
           </button>
         </div>
-        <button onClick={fetchMatch} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
-          <RefreshCw size={20} />
-        </button>
       </div>
 
       {isMatchComplete && (

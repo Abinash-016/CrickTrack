@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { PlusCircle, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import AddPlayerModal from '../components/AddPlayerModal';
 
 export default function Home() {
   const [matches, setMatches] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,18 +19,28 @@ export default function Home() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Recent Matches</h2>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-medium flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)]"
-        >
-          <PlusCircle size={20} /> New Match
-        </button>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowPlayerModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-full"
+          >
+            Add Player
+          </button>
+
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-medium flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+          >
+            <PlusCircle size={20} /> New Match
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4">
         {matches.map(match => (
-          <motion.div 
-            key={match._id} 
+          <motion.div
+            key={match._id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 hover:border-slate-600 transition-all cursor-pointer"
@@ -43,7 +55,7 @@ export default function Home() {
                 <span className="text-sm text-slate-400">{match.overs} Overs</span>
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center bg-slate-900/50 rounded-xl p-4 mt-4">
               <div className="text-center flex-1">
                 <div className="font-bold text-lg">{match.teams.teamA}</div>
@@ -74,6 +86,9 @@ export default function Home() {
       {showCreateModal && (
         <CreateMatchModal onClose={() => setShowCreateModal(false)} />
       )}
+      {showPlayerModal && (
+        <AddPlayerModal onClose={() => setShowPlayerModal(false)} />
+      )}
     </div>
   );
 }
@@ -97,7 +112,7 @@ function CreateMatchModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
@@ -106,38 +121,38 @@ function CreateMatchModal({ onClose }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm text-slate-400 mb-1">Match Name</label>
-            <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. Final Cup 2026" value={formData.matchName} onChange={e => setFormData({...formData, matchName: e.target.value})} />
+            <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. Final Cup 2026" value={formData.matchName} onChange={e => setFormData({ ...formData, matchName: e.target.value })} />
           </div>
           <div className="flex gap-4">
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Team A</label>
-              <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.teamA} onChange={e => setFormData({...formData, teamA: e.target.value})} />
+              <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.teamA} onChange={e => setFormData({ ...formData, teamA: e.target.value })} />
             </div>
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Team B</label>
-              <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.teamB} onChange={e => setFormData({...formData, teamB: e.target.value})} />
+              <input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.teamB} onChange={e => setFormData({ ...formData, teamB: e.target.value })} />
             </div>
           </div>
           <div className="flex gap-4">
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Total Overs</label>
-              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.overs} onChange={e => setFormData({...formData, overs: parseInt(e.target.value) || ''})} />
+              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.overs} onChange={e => setFormData({ ...formData, overs: parseInt(e.target.value) || '' })} />
             </div>
             <div className="flex-1">
               <label className="block text-sm text-slate-400 mb-1">Balls per Over</label>
-              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.ballsPerOver} onChange={e => setFormData({...formData, ballsPerOver: parseInt(e.target.value) || ''})} />
+              <input required type="number" min="1" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" value={formData.ballsPerOver} onChange={e => setFormData({ ...formData, ballsPerOver: parseInt(e.target.value) || '' })} />
             </div>
           </div>
           <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 mt-2">
             <label className="block text-sm font-semibold mb-3">Toss Details (Optional)</label>
             <div className="flex gap-2 mb-3">
               {[...new Set(['', formData.teamA, formData.teamB])].map(team => {
-                if(!team && (formData.teamA || formData.teamB)) return null;
+                if (!team && (formData.teamA || formData.teamB)) return null;
                 const label = team || 'Not decided';
                 return (
-                  <button 
+                  <button
                     key={label} type="button"
-                    onClick={() => setFormData({...formData, tossWinner: team})}
+                    onClick={() => setFormData({ ...formData, tossWinner: team })}
                     className={`flex-1 py-2 text-sm rounded-lg border ${formData.tossWinner === team ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'}`}
                   >
                     {label}
@@ -148,9 +163,9 @@ function CreateMatchModal({ onClose }) {
             {formData.tossWinner && (
               <div className="flex gap-2">
                 {['bat', 'bowl'].map(dec => (
-                  <button 
+                  <button
                     key={dec} type="button"
-                    onClick={() => setFormData({...formData, tossDecision: dec})}
+                    onClick={() => setFormData({ ...formData, tossDecision: dec })}
                     className={`flex-1 py-2 text-sm rounded-lg border capitalize ${formData.tossDecision === dec ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'}`}
                   >
                     {dec}
@@ -159,7 +174,7 @@ function CreateMatchModal({ onClose }) {
               </div>
             )}
           </div>
-          
+
           <div className="flex gap-3 mt-6">
             <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-semibold transition-colors">Cancel</button>
             <button type="submit" className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-colors">Start Match</button>

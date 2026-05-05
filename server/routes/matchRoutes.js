@@ -5,7 +5,7 @@ const Match = require('../models/Match');
 // Create a new match
 router.post('/create', async (req, res) => {
   try {
-    const { matchName, teamA, teamB, overs, ballsPerOver, tossWinner, tossDecision } = req.body;
+    const { matchName, teamA, teamB, teamAPlayers, teamBPlayers, overs, ballsPerOver, tossWinner, tossDecision } = req.body;
     
     // Determine batting/bowling team based on toss
     let battingTeam = teamA;
@@ -22,7 +22,7 @@ router.post('/create', async (req, res) => {
 
     const newMatch = new Match({
       matchName,
-      teams: { teamA, teamB },
+      teams: { teamA, teamB, teamAPlayers: teamAPlayers || [], teamBPlayers: teamBPlayers || [] },
       toss: { winner: tossWinner, decision: tossDecision },
       overs,
       ballsPerOver: ballsPerOver || 6,

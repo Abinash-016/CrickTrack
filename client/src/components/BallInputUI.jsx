@@ -45,7 +45,7 @@ export default function BallInputUI({ matchId, onBallAdded }) {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-5 gap-2 mb-2">
+      <div className="grid grid-cols-3 gap-2 mb-2">
         <button 
           onClick={() => quickExtra('wide')}
           className="h-10 rounded-xl font-bold bg-orange-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-500/30 active:scale-95 shadow-lg flex items-center justify-center text-sm"
@@ -58,18 +58,7 @@ export default function BallInputUI({ matchId, onBallAdded }) {
         >
           Nb
         </button>
-        <button 
-          onClick={() => quickExtra('bye')}
-          className="h-10 rounded-xl font-bold bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"
-        >
-          B
-        </button>
-        <button 
-          onClick={() => quickExtra('legBye')}
-          className="h-10 rounded-xl font-bold bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"
-        >
-          Lb
-        </button>
+
         <button 
           onClick={quickWicket}
           className="h-10 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 active:scale-95 shadow-lg flex items-center justify-center text-sm"

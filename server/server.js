@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const matchRoutes = require('./routes/matchRoutes');
+const playerRoutes = require('./routes/playerRoutes');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ✅ Routes
 app.use('/api/matches', matchRoutes);
+app.use('/api/players', playerRoutes);
 
 // ✅ Environment variables
 const PORT = process.env.PORT || 5000;

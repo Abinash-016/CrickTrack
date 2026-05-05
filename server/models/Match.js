@@ -31,7 +31,9 @@ const MatchSchema = new mongoose.Schema({
   matchName: { type: String, required: true },
   teams: {
     teamA: { type: String, required: true },
-    teamB: { type: String, required: true }
+    teamB: { type: String, required: true },
+    teamAPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
+    teamBPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }]
   },
   toss: {
     winner: { type: String }, // team name
