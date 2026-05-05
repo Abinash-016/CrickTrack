@@ -5,18 +5,24 @@ export default function AddPlayerModal({ onClose }) {
     const [name, setName] = useState('');
     const [avatar, setAvatar] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleAdd = async () => {
         if (!name) return alert('Enter player name');
+
         try {
+            setLoading(true);
+
             await api.post('/players/create', { name, avatar });
+
             onClose();
         } catch (err) {
             console.error(err);
-            alert(err.response?.data?.message || 'Failed to add player. Maybe player already exists 😂');
+            alert(err.response?.data?.message || 'Failed to add player');
+        } finally {
+            setLoading(false);
         }
     };
-
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
             <div className="bg-slate-900 p-6 rounded-xl w-full max-w-sm">
@@ -73,8 +79,12 @@ export default function AddPlayerModal({ onClose }) {
                     <button onClick={onClose} className="flex-1 bg-slate-700 py-2 rounded">
                         Cancel
                     </button>
-                    <button onClick={handleAdd} className="flex-1 bg-green-600 py-2 rounded text-white">
-                        Add
+                    <button
+                        onClick={handleAdd}
+                        disabled={loading}
+                        className="flex-1 bg-green-600 py-2 rounded text-white disabled:opacity-50"
+                    >
+                        {loading ? "Adding..." : "Add"}
                     </button>
                 </div>
             </div>
