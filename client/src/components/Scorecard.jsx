@@ -37,6 +37,9 @@ export default function Scorecard({ match }) {
   }, []);
 
   const addPlayerToTeam = async (playerId, team) => {
+
+    if (!playerId) return;
+
     try {
 
       await api.post(`/matches/${match._id}/add-player`, {
@@ -193,6 +196,7 @@ export default function Scorecard({ match }) {
 
                   ))}
                   <select
+                    defaultValue=""
                     onChange={(e) => addPlayerToTeam(e.target.value, 'A')}
                     className="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm"
                   >
@@ -240,6 +244,7 @@ export default function Scorecard({ match }) {
 
                   ))}
                   <select
+                    defaultValue=""
                     onChange={(e) => addPlayerToTeam(e.target.value, 'B')}
                     className="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm"
                   >
