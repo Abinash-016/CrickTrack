@@ -173,7 +173,12 @@ export default function Home() {
     </div>
   );
 }
-
+const formatName = (name) => {
+  return name
+    ?.split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
 function CreateMatchModal({ onClose }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
