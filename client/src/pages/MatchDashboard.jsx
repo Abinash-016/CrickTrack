@@ -15,7 +15,6 @@ export default function MatchDashboard() {
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [loadingMatch, setLoadingMatch] = useState(true);
 
   const handlePhotoCapture = (e) => {
     const file = e.target.files[0];
@@ -72,15 +71,13 @@ export default function MatchDashboard() {
 
   const fetchMatch = async () => {
     try {
-      setLoadingMatch(true);
 
       const res = await api.get(`/matches/${id}`);
 
       setMatch(res.data);
+
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoadingMatch(false);
     }
   };
 
@@ -102,21 +99,7 @@ export default function MatchDashboard() {
     }
   };
 
-  if (loadingMatch || !match) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-
-        <div className="w-12 h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-
-        <p className="text-lg font-medium">Loading Match...</p>
-
-        <p className="text-sm text-slate-500 mt-1">
-          Please wait while CricTrack fetches data
-        </p>
-
-      </div>
-    );
-  }
+  if (!match) return null;
 
   const currentInnings = match.innings[match.currentInnings - 1];
   const isMatchComplete = match.status === 'completed';

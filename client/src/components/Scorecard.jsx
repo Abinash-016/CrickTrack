@@ -117,59 +117,99 @@ export default function Scorecard({ match }) {
         )}
       </div>
       {showPlayers && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-slate-900 p-6 rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
 
-            <h3 className="text-lg font-bold mb-4">Players</h3>
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl p-6 shadow-2xl">
 
-            {/* Team A */}
-            <div className="mb-4">
-              <h4 className="text-blue-400 font-semibold mb-2">
-                {match.teams.teamA}
-              </h4>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
 
-              {match.teams.teamAPlayers.map(p => (
-                <div key={p._id} className="bg-slate-800 px-3 py-1 rounded text-sm">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={p.avatar || 'https://via.placeholder.com/30'}
-                      alt=""
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span>{formatName(p.name)}</span>
-                  </div>
-                </div>
-              ))}
+              <h2 className="text-2xl font-black text-white">
+                Match Players
+              </h2>
+
+              <button
+                onClick={() => setShowPlayers(false)}
+                className="bg-slate-800 hover:bg-slate-700 transition-colors px-4 py-2 rounded-xl text-sm font-semibold"
+              >
+                Close
+              </button>
+
             </div>
 
-            {/* Team B */}
-            <div>
-              <h4 className="text-purple-400 font-semibold mb-2">
-                {match.teams.teamB}
-              </h4>
+            {/* Teams Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-              {match.teams.teamBPlayers.map(p => (
-                <div key={p._id} className="text-sm">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={p.avatar || 'https://via.placeholder.com/30'}
-                      alt=""
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span>{formatName(p.name)}</span>
-                  </div>
+              {/* TEAM A */}
+              <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-4">
+
+                <h3 className="text-lg font-bold text-blue-400 mb-4">
+                  {match.teams.teamA}
+                </h3>
+
+                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
+
+                  {match.teams.teamAPlayers.map((p) => (
+
+                    <div
+                      key={p._id}
+                      className="flex items-center gap-3 bg-slate-900/70 hover:bg-slate-900 transition-all p-3 rounded-xl"
+                    >
+
+                      <img
+                        src={p.avatar || 'https://via.placeholder.com/40'}
+                        alt=""
+                        className="w-12 h-12 rounded-full object-cover border-2 border-slate-700"
+                      />
+
+                      <span className="text-white font-medium text-base">
+                        {formatName(p.name)}
+                      </span>
+
+                    </div>
+
+                  ))}
+
                 </div>
-              ))}
-            </div>
+              </div>
 
-            <button
-              onClick={() => setShowPlayers(false)}
-              className="mt-4 w-full bg-slate-700 py-2 rounded"
-            >
-              Close
-            </button>
+              {/* TEAM B */}
+              <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-4">
+
+                <h3 className="text-lg font-bold text-pink-400 mb-4">
+                  {match.teams.teamB}
+                </h3>
+
+                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
+
+                  {match.teams.teamBPlayers.map((p) => (
+
+                    <div
+                      key={p._id}
+                      className="flex items-center gap-3 bg-slate-900/70 hover:bg-slate-900 transition-all p-3 rounded-xl"
+                    >
+
+                      <img
+                        src={p.avatar || 'https://via.placeholder.com/40'}
+                        alt=""
+                        className="w-12 h-12 rounded-full object-cover border-2 border-slate-700"
+                      />
+
+                      <span className="text-white font-medium text-base">
+                        {formatName(p.name)}
+                      </span>
+
+                    </div>
+
+                  ))}
+
+                </div>
+              </div>
+
+            </div>
 
           </div>
+
         </div>
       )}
     </div>
