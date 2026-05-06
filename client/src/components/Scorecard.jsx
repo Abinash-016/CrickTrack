@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../api';
 
 export default function Scorecard({ match }) {
   const [activeInnings, setActiveInnings] = useState(match.currentInnings - 1);
   const [showPlayers, setShowPlayers] = useState(false);
-
+  const [allPlayers, setAllPlayers] = useState([]);
   const getBallLabel = (ball) => {
     if (ball.wicket.isWicket) return 'W';
     if (ball.extras.type !== 'none') {
@@ -27,6 +28,28 @@ export default function Scorecard({ match }) {
       ?.split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  };
+
+  useEffect(() => {
+    api.get('/players')
+      .then(res => setAllPlayers(res.data))
+      .catch(console.error);
+  }, []);
+
+  const addPlayerToTeam = async (playerId, team) => {
+    try {
+
+      await api.post(`/matches/${match._id}/add-player`, {
+        playerId,
+        team
+      });
+
+      window.location.reload();
+
+    } catch (error) {
+      console.error(error);
+      alert('Failed to add player');
+    }
   };
 
   const formatOverTracker = (balls) => {
@@ -169,6 +192,18 @@ export default function Scorecard({ match }) {
                     </div>
 
                   ))}
+                  <select
+                    onChange={(e) => addPlayerToTeam(e.target.value, 'A')}
+                    className="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm"
+                  >
+                    <option value="">+ Add Player</option>
+
+                    {allPlayers.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {formatName(p.name)}
+                      </option>
+                    ))}
+                  </select>
 
                 </div>
               </div>
@@ -183,6 +218,8 @@ export default function Scorecard({ match }) {
                 <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
 
                   {match.teams.teamBPlayers.map((p) => (
+
+
 
                     <div
                       key={p._id}
@@ -202,6 +239,18 @@ export default function Scorecard({ match }) {
                     </div>
 
                   ))}
+                  <select
+                    onChange={(e) => addPlayerToTeam(e.target.value, 'A')}
+                    className="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm"
+                  >
+                    <option value="">+ Add Player</option>
+
+                    {allPlayers.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {formatName(p.name)}
+                      </option>
+                    ))}
+                  </select>
 
                 </div>
               </div>

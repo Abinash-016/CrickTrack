@@ -244,5 +244,46 @@ router.post('/:id/photo', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Add player to a team during match
+router.post('/:id/add-player', async (req, res) => {
+  try {
 
+    const { playerId, team } = req.body;
+
+    const match = await Match.findById(req.params.id);
+
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
+    if (team === 'A') {
+
+      const alreadyExists = match.teams.teamAPlayers.includes(playerId);
+
+      if (!alreadyExists) {
+        match.teams.teamAPlayers.push(playerId);
+      }
+
+    } else if (team === 'B') {
+
+      const alreadyExists = match.teams.teamBPlayers.includes(playerId);
+
+      if (!alreadyExists) {
+        match.teams.teamBPlayers.push(playerId);
+      }
+
+    }
+
+    await match.save();
+
+    const updatedMatch = await Match.findById(req.params.id)
+      .populate('teams.teamAPlayers')
+      .populate('teams.teamBPlayers');
+
+    res.json(updatedMatch);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 module.exports = router;
