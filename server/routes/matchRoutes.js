@@ -58,15 +58,20 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // Get a match by ID
 router.get('/:id', async (req, res) => {
   try {
+
     const match = await Match.findById(req.params.id)
       .populate('teams.teamAPlayers')
       .populate('teams.teamBPlayers');
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+
+    if (!match) {
+      return res.status(404).json({ message: 'Match not found' });
+    }
+
     res.json(match);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
