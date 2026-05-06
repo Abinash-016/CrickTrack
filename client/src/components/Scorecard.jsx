@@ -240,7 +240,7 @@ export default function Scorecard({ match }) {
 
                   ))}
                   <select
-                    onChange={(e) => addPlayerToTeam(e.target.value, 'A')}
+                    onChange={(e) => addPlayerToTeam(e.target.value, 'B')}
                     className="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm"
                   >
                     <option value="">+ Add Player</option>
