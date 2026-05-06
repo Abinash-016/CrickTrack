@@ -10,11 +10,26 @@ export default function Home() {
   const [matches, setMatches] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [loadingMatches, setLoadingMatches] = useState(true);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/matches').then(res => setMatches(res.data)).catch(console.error);
+    const fetchMatches = async () => {
+      try {
+        setLoadingMatches(true);
+
+        const res = await api.get('/matches');
+
+        setMatches(res.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingMatches(false);
+      }
+    };
+
+    fetchMatches();
   }, []);
 
   return (
@@ -49,7 +64,32 @@ export default function Home() {
       </div>
 
       <div className="grid gap-4">
-        {matches.map(match => (
+
+        {loadingMatches && (
+          <div className="flex flex-col items-center justify-center py-20">
+
+            {/* Spinner */}
+            <div className="relative w-20 h-20">
+
+              <div className="absolute inset-0 rounded-full border-4 border-slate-700"></div>
+
+              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin"></div>
+
+              <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-indigo-500 animate-spin [animation-duration:1.5s]"></div>
+
+            </div>
+
+            {/* Loading bars */}
+            <div className="mt-8 space-y-3 w-56">
+              <div className="h-3 bg-slate-800 rounded-full animate-pulse"></div>
+              <div className="h-3 bg-slate-800 rounded-full animate-pulse w-5/6 mx-auto"></div>
+              <div className="h-3 bg-slate-800 rounded-full animate-pulse w-4/6 mx-auto"></div>
+            </div>
+
+          </div>
+        )}
+
+        {!loadingMatches && matches.map(match => (
           <motion.div
             key={match._id}
             initial={{ opacity: 0, y: 10 }}
@@ -59,39 +99,66 @@ export default function Home() {
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-900 px-2 py-1 rounded-md">{match.status.replace('_', ' ')}</span>
-                <h3 className="text-lg font-bold mt-2">{match.matchName}</h3>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-900 px-2 py-1 rounded-md">
+                  {match.status.replace('_', ' ')}
+                </span>
+
+                <h3 className="text-lg font-bold mt-2">
+                  {match.matchName}
+                </h3>
               </div>
+
               <div className="text-right">
-                <span className="text-sm text-slate-400">{match.overs} Overs</span>
+                <span className="text-sm text-slate-400">
+                  {match.overs} Overs
+                </span>
               </div>
             </div>
 
             <div className="flex justify-between items-center bg-slate-900/50 rounded-xl p-4 mt-4">
+
               <div className="text-center flex-1">
-                <div className="font-bold text-lg">{match.teams.teamA}</div>
+                <div className="font-bold text-lg">
+                  {match.teams.teamA}
+                </div>
+
                 <div className="text-sm text-slate-400 mt-1">
-                  {match.innings[0] ? `${match.innings[0].totalRuns}/${match.innings[0].totalWickets}` : '0/0'}
+                  {match.innings[0]
+                    ? `${match.innings[0].totalRuns}/${match.innings[0].totalWickets}`
+                    : '0/0'}
                 </div>
               </div>
-              <div className="px-4 font-black text-slate-600 italic">VS</div>
+
+              <div className="px-4 font-black text-slate-600 italic">
+                VS
+              </div>
+
               <div className="text-center flex-1">
-                <div className="font-bold text-lg">{match.teams.teamB}</div>
+                <div className="font-bold text-lg">
+                  {match.teams.teamB}
+                </div>
+
                 <div className="text-sm text-slate-400 mt-1">
-                  {match.innings[1] && match.status !== 'not_started' ? `${match.innings[1].totalRuns}/${match.innings[1].totalWickets}` : 'Yet to bat'}
+                  {match.innings[1] && match.status !== 'not_started'
+                    ? `${match.innings[1].totalRuns}/${match.innings[1].totalWickets}`
+                    : 'Yet to bat'}
                 </div>
               </div>
+
             </div>
           </motion.div>
         ))}
-        {matches.length === 0 && (
+
+        {!loadingMatches && matches.length === 0 && (
           <div className="text-center py-12 text-slate-500">
             <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <PlayCircle size={32} className="text-slate-600" />
             </div>
+
             <p>No matches found. Create one to start scoring!</p>
           </div>
         )}
+
       </div>
 
       {showCreateModal && (
@@ -223,7 +290,7 @@ function CreateMatchModal({ onClose }) {
                         }
                       }}
                     />
-                    {p.name}
+                    {formatName(p.name)}
                   </label>
                 ))}
               </div>
@@ -246,7 +313,7 @@ function CreateMatchModal({ onClose }) {
                         }
                       }}
                     />
-                    {p.name}
+                    {formatName(p.name)}
                   </label>
                 ))}
               </div>

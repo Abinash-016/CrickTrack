@@ -15,6 +15,7 @@ export default function MatchDashboard() {
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [loadingMatch, setLoadingMatch] = useState(true);
 
   const handlePhotoCapture = (e) => {
     const file = e.target.files[0];
@@ -28,19 +29,19 @@ export default function MatchDashboard() {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        
+
         if (width > 1280) {
           height = Math.round(height * (1280 / width));
           width = 1280;
         }
-        
+
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        
+
         api.post(`/matches/${id}/photo`, { photo: dataUrl })
           .then(() => fetchMatch())
           .catch(err => {
@@ -71,16 +72,21 @@ export default function MatchDashboard() {
 
   const fetchMatch = async () => {
     try {
+      setLoadingMatch(true);
+
       const res = await api.get(`/matches/${id}`);
+
       setMatch(res.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingMatch(false);
     }
   };
 
   useEffect(() => {
     fetchMatch();
-    const interval = setInterval(fetchMatch, 5000); // Auto-refresh every 5s for spectator mode
+    const interval = setInterval(fetchMatch, 10000);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -96,7 +102,21 @@ export default function MatchDashboard() {
     }
   };
 
-  if (!match) return <div className="text-center py-10">Loading match...</div>;
+  if (loadingMatch || !match) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+
+        <div className="w-12 h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+
+        <p className="text-lg font-medium">Loading Match...</p>
+
+        <p className="text-sm text-slate-500 mt-1">
+          Please wait while CricTrack fetches data
+        </p>
+
+      </div>
+    );
+  }
 
   const currentInnings = match.innings[match.currentInnings - 1];
   const isMatchComplete = match.status === 'completed';
@@ -109,13 +129,13 @@ export default function MatchDashboard() {
           <ArrowLeft size={20} />
         </button>
         <div className="flex bg-slate-800 rounded-lg p-1">
-          <button 
+          <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'live' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}
             onClick={() => setActiveTab('live')}
           >
             Live Score
           </button>
-          <button 
+          <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'scorecard' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-white'}`}
             onClick={() => setActiveTab('scorecard')}
           >
@@ -127,23 +147,23 @@ export default function MatchDashboard() {
       {isMatchComplete && (
         <div className="bg-emerald-900/40 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl flex flex-col items-center text-center font-bold gap-4">
           <span>Match Completed! Winner: {match.winner}</span>
-          
+
           {match.winnersPhoto ? (
             <div className="w-full max-w-sm rounded-lg overflow-hidden border-2 border-emerald-500/50 shadow-xl">
               <img src={match.winnersPhoto} alt="Winners" className="w-full h-auto object-cover" />
             </div>
           ) : (
             <div>
-              <input 
-                type="file" 
-                accept="image/*" 
-                capture="environment" 
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
                 id="cameraInput"
                 className="hidden"
                 onChange={handlePhotoCapture}
                 disabled={uploadingPhoto}
               />
-              <label 
+              <label
                 htmlFor="cameraInput"
                 className={`flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl cursor-pointer transition-all shadow-lg ${uploadingPhoto ? 'opacity-50 pointer-events-none' : 'active:scale-95'}`}
               >

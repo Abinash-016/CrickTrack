@@ -4,6 +4,13 @@ import api from '../api';
 export default function ViewPlayersModal({ onClose }) {
     const [players, setPlayers] = useState([]);
 
+    const formatName = (name) => {
+        return name
+            ?.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
     useEffect(() => {
         api.get('/players')
             .then(res => setPlayers(res.data))
@@ -27,7 +34,7 @@ export default function ViewPlayersModal({ onClose }) {
                                 alt="avatar"
                                 className="w-8 h-8 rounded-full object-cover"
                             />
-                            <span>{p.name}</span>
+                            <span>{formatName(p.name)}</span>
                         </div>
                     ))}
                 </div>

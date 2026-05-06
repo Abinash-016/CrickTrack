@@ -22,6 +22,13 @@ export default function Scorecard({ match }) {
     return 'bg-slate-800 text-slate-200 border-slate-600';
   };
 
+  const formatName = (name) => {
+    return name
+      ?.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const formatOverTracker = (balls) => {
     // Group balls by overNumber
     const overs = {};
@@ -129,7 +136,7 @@ export default function Scorecard({ match }) {
                       alt=""
                       className="w-8 h-8 rounded-full object-cover"
                     />
-                    <span>{p.name}</span>
+                    <span>{formatName(p.name)}</span>
                   </div>
                 </div>
               ))}
@@ -149,7 +156,7 @@ export default function Scorecard({ match }) {
                       alt=""
                       className="w-8 h-8 rounded-full object-cover"
                     />
-                    <span>{p.name}</span>
+                    <span>{formatName(p.name)}</span>
                   </div>
                 </div>
               ))}
