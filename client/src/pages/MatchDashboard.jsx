@@ -15,6 +15,7 @@ export default function MatchDashboard() {
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showUndoModal, setShowUndoModal] = useState(false);
 
   const handlePhotoCapture = (e) => {
     const file = e.target.files[0];
@@ -88,15 +89,23 @@ export default function MatchDashboard() {
   }, [id]);
 
   const handleUndo = async () => {
-    if (window.confirm("Are you sure you want to undo the last ball?")) {
-      try {
-        await api.post(`/matches/${id}/undo`);
-        fetchMatch();
-      } catch (error) {
-        console.error(error);
-        alert(error.response?.data?.message || "Failed to undo");
-      }
+
+    try {
+
+      await api.post(`/matches/${id}/undo`);
+
+      fetchMatch();
+
+      setShowUndoModal(false);
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(error.response?.data?.message || "Failed to undo");
+
     }
+
   };
 
   if (!match) return null;
@@ -178,13 +187,51 @@ export default function MatchDashboard() {
           <div className="container mx-auto max-w-lg md:max-w-3xl relative">
             <div className="flex justify-between items-center mb-3 px-2">
               <span className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Scoring Actions</span>
-              <button onClick={handleUndo} className="text-sm text-red-400 flex items-center gap-1 hover:text-red-300 transition-colors font-medium">
+              <button onClick={() => setShowUndoModal(true)} className="text-sm text-red-400 flex items-center gap-1 hover:text-red-300 transition-colors font-medium">
                 <Undo2 size={16} /> Undo Last Ball
               </button>
             </div>
             <BallInputUI matchId={id} onBallAdded={fetchMatch} />
           </div>
         </div>
+      )}
+
+      {showUndoModal && (
+
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+
+            <h2 className="text-xl font-black mb-2">
+              Delete Last Ball?
+            </h2>
+
+            <p className="text-slate-400 text-sm mb-6">
+              This will remove the previous ball from the scorecard.
+            </p>
+
+            <div className="flex gap-3">
+
+              <button
+                onClick={() => setShowUndoModal(false)}
+                className="flex-1 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all font-semibold"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUndo}
+                className="flex-1 h-11 rounded-xl bg-red-600 hover:bg-red-500 transition-all font-semibold text-white"
+              >
+                Undo
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
       )}
     </div>
   );
