@@ -153,7 +153,20 @@ export default function BallInputUI({ matchId, match, setMatch }) {
       </div>
       <div className="grid grid-cols-3 gap-2 mb-2">
         <button
-          onClick={() => quickExtra('wide')}
+          onClick={() =>
+            addBall({
+              runs: 0,
+              extras: {
+                type: 'wide',
+                runs: 1
+              },
+              isLegalDelivery: false,
+              wicket: {
+                isWicket: false,
+                type: 'none'
+              }
+            })
+          }
           className="h-10 rounded-xl font-bold bg-orange-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-500/30 active:scale-95 shadow-lg flex items-center justify-center text-sm"
         >
           Wd

@@ -15,28 +15,7 @@ export default function LiveScore({ match, currentInnings }) {
     requiredRR = ballsRemaining === 0 ? 0 : (runsNeeded / (ballsRemaining / 6)).toFixed(2);
   }
 
-  // Get last 18 balls
-  const allBalls = currentInnings.balls || [];
-  const uniqueBalls = [];
-
-  const seen = new Set();
-
-  allBalls.forEach((ball) => {
-
-    const key =
-      `${ball.overNumber}-${ball.ballNumber}`;
-
-    if (!seen.has(key)) {
-
-      seen.add(key);
-
-      uniqueBalls.push(ball);
-
-    }
-
-  });
-
-  const recentBalls = uniqueBalls.slice(-18);
+  const recentBalls = currentInnings.balls.slice(-18);
 
   const recentOvers = {};
   recentBalls.forEach(ball => {
@@ -135,7 +114,11 @@ export default function LiveScore({ match, currentInnings }) {
                 <div className="flex flex-wrap gap-2 border-l border-slate-700 pl-3">
                   {recentOvers[overNum].map((ball, idx) => (
                     <motion.div
-                      key={ball._id || idx}
+                      key={
+                        ball._id ||
+                        ball.tempId ||
+                        `${ball.overNumber}-${ball.ballNumber}-${idx}`
+                      }
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       className="flex flex-col items-center gap-1"
