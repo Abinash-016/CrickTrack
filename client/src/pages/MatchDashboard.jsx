@@ -84,7 +84,7 @@ export default function MatchDashboard() {
 
   useEffect(() => {
     fetchMatch();
-    const interval = setInterval(fetchMatch, 10000);
+    const interval = setInterval(fetchMatch, 30000);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -191,7 +191,11 @@ export default function MatchDashboard() {
                 <Undo2 size={16} /> Undo Last Ball
               </button>
             </div>
-            <BallInputUI matchId={id} onBallAdded={fetchMatch} />
+            <BallInputUI
+              matchId={id}
+              match={match}
+              setMatch={setMatch}
+            />
           </div>
         </div>
       )}

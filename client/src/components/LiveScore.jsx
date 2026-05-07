@@ -4,7 +4,7 @@ export default function LiveScore({ match, currentInnings }) {
   // Calculate Run Rate
   const totalBalls = (currentInnings.completedOvers * match.ballsPerOver) + currentInnings.ballsInCurrentOver;
   const currentRR = totalBalls === 0 ? 0 : (currentInnings.totalRuns / (totalBalls / 6)).toFixed(2);
-  
+
   // Required Run Rate (if 2nd innings)
   let requiredRR = null;
   let targetRuns = null;
@@ -17,7 +17,26 @@ export default function LiveScore({ match, currentInnings }) {
 
   // Get last 18 balls
   const allBalls = currentInnings.balls || [];
-  const recentBalls = allBalls.slice(-18);
+  const uniqueBalls = [];
+
+  const seen = new Set();
+
+  allBalls.forEach((ball) => {
+
+    const key =
+      `${ball.overNumber}-${ball.ballNumber}`;
+
+    if (!seen.has(key)) {
+
+      seen.add(key);
+
+      uniqueBalls.push(ball);
+
+    }
+
+  });
+
+  const recentBalls = uniqueBalls.slice(-18);
 
   const recentOvers = {};
   recentBalls.forEach(ball => {
@@ -63,7 +82,7 @@ export default function LiveScore({ match, currentInnings }) {
       {/* Main Score Board */}
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-        
+
         <div className="text-center mb-6">
           <h3 className="text-slate-400 font-medium uppercase tracking-widest text-xs mb-1">
             {currentInnings.battingTeam} Batting
@@ -110,7 +129,7 @@ export default function LiveScore({ match, currentInnings }) {
           {Object.keys(recentOvers).length === 0 ? (
             <span className="text-slate-500 text-sm">No balls bowled yet.</span>
           ) : (
-            Object.keys(recentOvers).sort((a,b) => a - b).map(overNum => (
+            Object.keys(recentOvers).sort((a, b) => a - b).map(overNum => (
               <div key={overNum} className="flex items-center gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700/50">
                 <span className="text-xs text-slate-400 font-bold w-10 shrink-0 text-center">Ov {parseInt(overNum) + 1}</span>
                 <div className="flex flex-wrap gap-2 border-l border-slate-700 pl-3">

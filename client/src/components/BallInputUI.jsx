@@ -2,19 +2,96 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 
-export default function BallInputUI({ matchId, onBallAdded }) {
+export default function BallInputUI({ matchId, match, setMatch }) {
   const addBall = async (ballData) => {
-    // Optimistically fire and forget to prevent blocking the UI
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
     try {
-      await api.post(`/matches/${matchId}/ball`, ballData);
-      onBallAdded();
+
+      // LOCAL UI UPDATE
+      const updatedMatch = structuredClone(match);
+
+      const innings =
+        updatedMatch.innings[updatedMatch.currentInnings - 1];
+
+      const overNumber = innings.completedOvers;
+
+      const ballNumber =
+        innings.ballsInCurrentOver + 1;
+
+      const newBall = {
+        tempId: Date.now(),
+        innings: updatedMatch.currentInnings,
+        overNumber,
+        ballNumber,
+        runs: ballData.runs || 0,
+        extras: ballData.extras || {
+          type: 'none',
+          runs: 0
+        },
+        isLegalDelivery:
+          ballData.isLegalDelivery !== false,
+        wicket:
+          ballData.wicket || {
+            isWicket: false,
+            type: 'none'
+          }
+      };
+
+      innings.balls.push(newBall);
+      innings.totalRuns +=
+        newBall.runs + newBall.extras.runs;
+
+      if (newBall.wicket.isWicket) {
+        innings.totalWickets += 1;
+      }
+
+      if (newBall.isLegalDelivery) {
+
+        innings.ballsInCurrentOver += 1;
+
+        if (
+          innings.ballsInCurrentOver >=
+          updatedMatch.ballsPerOver
+        ) {
+
+          innings.completedOvers += 1;
+
+          innings.ballsInCurrentOver = 0;
+        }
+      }
+
+      setMatch(updatedMatch);
+
+      // WAIT FOR SERVER
+      await api.post(
+        `/matches/${matchId}/ball`,
+        ballData
+      );
+
     } catch (error) {
+
       console.error(error);
-      alert(error.response?.data?.message || 'Error adding ball');
+
+      alert(
+        error.response?.data?.message ||
+        'Error adding ball'
+      );
+
+    } finally {
+
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 250);
+
     }
+
   };
   const [showExtraPopup, setShowExtraPopup] = useState(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const quickAdd = (runs) => {
     addBall({ runs, extras: { type: 'none', runs: 0 }, isLegalDelivery: true, wicket: { isWicket: false, type: 'none' } });
   };
@@ -103,7 +180,7 @@ export default function BallInputUI({ matchId, onBallAdded }) {
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{
                       type: 'spring',
-                      stiffness: 300,
+                      stiffness: 100,
                       damping: 18,
                       delay: index * 0.03
                     }}
@@ -128,7 +205,7 @@ export default function BallInputUI({ matchId, onBallAdded }) {
                   exit={{ scale: 0, opacity: 0 }}
                   transition={{
                     type: 'spring',
-                    stiffness: 300,
+                    stiffness: 100,
                     damping: 18
                   }}
                   onClick={() =>
