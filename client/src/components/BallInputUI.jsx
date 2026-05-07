@@ -61,7 +61,25 @@ export default function BallInputUI({ matchId, match, setMatch }) {
           innings.completedOvers += 1;
 
           innings.ballsInCurrentOver = 0;
+
         }
+
+      }
+
+      // INSTANT INNINGS SWITCH
+      const inningsFinished =
+        innings.completedOvers >= updatedMatch.overs ||
+        innings.totalWickets >= 10;
+
+      if (
+        inningsFinished &&
+        updatedMatch.currentInnings === 1
+      ) {
+
+        innings.isCompleted = true;
+
+        updatedMatch.currentInnings = 2;
+
       }
 
       setMatch(updatedMatch);
